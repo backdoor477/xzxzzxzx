@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/eud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --accent: #ff6b6b;
+            --accent-glow: rgba(255, 107, 107, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --green: #00ff00;
+            --red: #ff0000;
+            --blue: #00bfff;
+            --yellow: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 107, 107, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 107, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Scanlines effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 107, 107, 0.01) 2px,
+                rgba(255, 107, 107, 0.01) 4px
+            );
+            pointer-events: none;
+            z-index: -1;
+            animation: scanlines 0.1s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        /* Glitch effect for title */
+        .glitch {
+            position: relative;
+            font-weight: 800;
+            font-size: clamp(4rem, 12vw, 8rem);
+            line-height: 1;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .glitch::before {
+            color: #ff0000;
+            animation: glitch-1 0.3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        }
+
+        .glitch::after {
+            color: #00ffff;
+            animation: glitch-2 0.3s infinite;
+            clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+        }
+
+        .glitch:hover::before {
+            animation: glitch-1 0.1s infinite;
+        }
+
+        .glitch:hover::after {
+            animation: glitch-2 0.1s infinite;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, -2px); }
+            20% { transform: translate(2px, 2px); }
+            30% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            50% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            70% { transform: translate(-2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            90% { transform: translate(-2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(2px, 2px); }
+            20% { transform: translate(-2px, -2px); }
+            30% { transform: translate(2px, -2px); }
+            40% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, 2px); }
+            60% { transform: translate(-2px, -2px); }
+            70% { transform: translate(2px, -2px); }
+            80% { transform: translate(-2px, 2px); }
+            90% { transform: translate(2px, 2px); }
+        }
+
+        /* Entry screen */
+        .entry-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin: 2rem auto 0;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.5); }
+        }
+
+        /* Terminal hacking screen */
+        .terminal-screen {
+            display: none;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .terminal-window {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-width: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .terminal-titlebar {
+            background: rgba(30, 30, 30, 0.9);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27ca3f; }
+
+        .terminal-title {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .terminal-content {
+            padding: 1.5rem;
+            min-height: 500px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            line-height: 1.4;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.3rem;
+        }
+
+        .terminal-prompt {
+            color: var(--green);
+        }
+
+        .terminal-input {
+            color: var(--blue);
+        }
+
+        .terminal-cursor {
+            background: var(--text-primary);
+            animation: blink 1s infinite;
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .terminal-success {
+            color: var(--green);
+        }
+
+        .terminal-info {
+            color: var(--blue);
+        }
+
+        .terminal-warning {
+            color: var(--yellow);
+        }
+
+        .terminal-error {
+            color: var(--red);
+        }
+
+        .terminal-highlight {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Loading animation for hacking sequences */
+        .loading-bar {
+            display: inline-block;
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--blue));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        /* Members screen */
+        .members-screen {
+            display: none;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 100;
+            background: rgba(17, 17, 17, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .back-btn:hover {
+            color: var(--accent);
+            transform: translateX(-5px);
+        }
+
+        .terminal-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+        }
+
+        .discord-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .discord-link:hover {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .members-container {
+            margin-top: 6rem;
+        }
+
+        .members-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .members-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .members-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .member-card {
+            background: linear-gradient(135deg, rgba(10, 10, 15, 0.95), rgba(20, 20, 30, 0.9));
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            max-width: 450px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 0 1px rgba(255, 107, 107, 0.1);
+        }
+
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .member-card:hover::before {
+            opacity: 1;
+        }
+
+        .member-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 
+                0 20px 60px rgba(255, 107, 107, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 0 0 1px var(--accent);
+            background: linear-gradient(135deg, rgba(15, 15, 25, 0.98), rgba(25, 25, 40, 0.95));
+        }
+
+        .member-icon {
+            font-size: 2rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            opacity: 0.7;
+        }
+
+        .member-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .member-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            object-fit: cover;
+            position: relative;
+            align-self: flex-start;
+            background: linear-gradient(135deg, var(--accent), #333);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .member-card:hover .member-avatar {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .member-title {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .threat-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border: 2px solid;
+        }
+
+        .threat-top { 
+            background: rgba(255, 68, 68, 0.1); 
+            border-color: #ff4444; 
+            color: #ff4444; 
+        }
+
+        .threat-high { 
+            background: rgba(255, 136, 0, 0.1); 
+            border-color: #ff8800; 
+            color: #ff8800; 
+        }
+
+        .threat-elevated { 
+            background: rgba(255, 102, 0, 0.1); 
+            border-color: #ff6600; 
+            color: #ff6600; 
+        }
+
+        .threat-moderate { 
+            background: rgba(255, 170, 0, 0.1); 
+            border-color: #ffaa00; 
+            color: #ffaa00; 
+        }
+
+        .threat-low { 
+            background: rgba(255, 68, 68, 0.1); 
+            border-color: #44ff44; 
+            color: #44ff44; 
+        }
+
+        .threat-unknown { 
+            background: rgba(136, 136, 136, 0.1); 
+            border-color: #888888; 
+            color: #888888; 
+        }
+
+        .member-status {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .status-note {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .member-rank {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: linear-gradient(135deg, var(--accent), #ff8a8a);
+            color: var(--text-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+        }
+
+        /* Fade transitions */
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.5s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glitch {
+                font-size: 3rem;
+            }
+            
+            .members-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .terminal-header {
+                padding: 1rem;
+            }
+            
+            .back-btn {
+                left: 1rem;
+                top: 1rem;
+            }
+        }
+
+        /* Staggered animation for member cards */
+        .member-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .member-card:nth-child(1) { animation-delay: 0.1s; }
+        .member-card:nth-child(2) { animation-delay: 0.2s; }
+        .member-card:nth-child(3) { animation-delay: 0.3s; }
+        .member-card:nth-child(4) { animation-delay: 0.4s; }
+        .member-card:nth-child(5) { animation-delay: 0.5s; }
+        .member-card:nth-child(6) { animation-delay: 0.6s; }
+        .member-card:nth-child(7) { animation-delay: 0.7s; }
+        .member-card:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Entry Screen -->
+    <div id="entry-screen" class="entry-screen">
+        <div class="glitch" id="entry-title" data-text="/eud">/eud</div>
+        <div class="subtitle">click to access</div>
+        <div class="pulse-dot"></div>
+    </div>
+
+    <!-- Terminal Hacking Screen -->
+    <div id="terminal-screen" class="terminal-screen">
+        <div class="terminal-window">
+            <div class="terminal-titlebar">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+                <div class="terminal-title">eud@fsociety — eud_breach.py — 120×40</div>
+            </div>
+            <div class="terminal-content" id="terminal-content">
+                <!-- Terminal output will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Members Screen -->
+    <div id="members-screen" class="members-screen">
+        <a href="#" class="back-btn" id="back-btn">← back</a>
+        
+        <div class="terminal-header">
+            <div class="terminal-line">
+                <a href="https://discord.gg/eud" target="_blank" class="discord-link">discord.gg/eud</a>
+            </div>
+        </div>
+
+        <div class="members-container">
+            <div class="members-header">
+                <h1 class="members-title">Active Members</h1>
+                <p class="members-subtitle">EUD Network Directory</p>
+            </div>
+            <div class="members-grid" id="members-grid">
+                <!-- Member cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Member data with custom profiles
+        const members = [
+            { 
+                name: '58eud', 
+                username: '58eudd',
+                profilePicture: '58eud.png',
+                icon: '🕷️',
+                title: 'Co-Leader of EUD Operations',
+                threatLevel: 'TOP THREAT',
+                threatColor: '#ff4444',
+                status: 'More ghost than agent. No firewall has ever stopped them. Not even ours. Frequently goes off-mission—results always speak louder than protocol.',
+                note: 'Keeps their own logs, encrypted beyond our reach.',
+                rank: 'Co-Leader'
+            },
+            { 
+                name: 'Zeud', 
+                username: 'zeud',
+                profilePicture: 'Zeud.png',
+                icon: '👑',
+                title: 'Co-Leader of EUD Operations',
+                threatLevel: 'TOP THREAT',
+                threatColor: '#ff4444',
+                status: 'Orchestrator of cyber destruction. Silent architect of Red Team escalation. Has root access to systems that don\'t officially exist.',
+                note: 'When Zeud is online, something is already burning.',
+                rank: 'Co-Leader'
+            },
+            { 
+                name: '48eud', 
+                username: 'dx.2.xd2.24',
+                profilePicture: '48eud.png',
+                icon: '💻',
+                title: 'Red Team Commander',
+                threatLevel: 'HIGH',
+                threatColor: '#ff8800',
+                status: 'Trains by breaking what others build. Leads simulated attacks with real-world consequences. Operates like a rogue APT—only on your side.',
+                note: 'Probably.',
+                rank: 'Commander'
+            },
+            { 
+                name: '79eud', 
+                username: '79eud',
+                profilePicture: '79eud.png',
+                icon: '🧠',
+                title: 'Supreme Director of Cybersecurity',
+                threatLevel: 'TOP THREAT',
+                threatColor: '#ff4444',
+                status: 'The absolute authority over all cyber operations—defensive and offensive. Controls the entire architecture of the system. Nothing moves without their approval. Mastermind of containment, surveillance, and breach retaliation.',
+                note: 'Feared even by Red Team.',
+                rank: 'Supreme'
+            },
+            { 
+                name: '32eud', 
+                username: '80h',
+                profilePicture: '32eud.png',
+                icon: '📡',
+                title: 'Signals Interceptor & Decryption Specialist',
+                threatLevel: 'MODERATE',
+                threatColor: '#ffaa00',
+                status: 'The silent signal breaker. Taps into encrypted networks, extracts patterns, and leaves no trace.',
+                note: 'Operates in radio silence, even internally.',
+                rank: 'Specialist'
+            },
+            { 
+                name: '13eud', 
+                username: '13eud',
+                profilePicture: '13eud.png',
+                icon: '👁️',
+                title: 'Chief Intelligence Analyst',
+                threatLevel: 'LOW',
+                threatColor: '#44ff44',
+                status: 'The data watcher. Monitors all ingress and egress traffic. Can trace a spoofed packet across seven countries in 30 seconds.',
+                note: 'Surveillance is their art.',
+                rank: 'Analyst'
+            },
+            { 
+                name: '99eud', 
+                username: 'lol71',
+                profilePicture: '99eud.png',
+                icon: '🧬',
+                title: 'Malware Analyst & Reverse Engineer',
+                threatLevel: 'ELEVATED',
+                threatColor: '#ff6600',
+                status: 'Knows every strain of malware like an old friend. Can turn a zero-day into a weapon—or a shield.',
+                note: 'May be hoarding samples beyond protocol.',
+                rank: 'Engineer'
+            },
+            { 
+                name: '94eud', 
+                username: '__.___.__.____.',
+                profilePicture: '94eud.png',
+                icon: '🌑',
+                title: 'Deep Operations Ghost',
+                threatLevel: 'UNKNOWN',
+                threatColor: '#888888',
+                status: 'Has no IP history, login metadata, or confirmed origin. Only signs of activity: anomalies in sandboxed test environments.',
+                note: 'Possibly AI. Possibly not.',
+                rank: 'Ghost'
+            }
+        ];
+
+        // Elements
+        const entryScreen = document.getElementById('entry-screen');
+        const terminalScreen = document.getElementById('terminal-screen');
+        const membersScreen = document.getElementById('members-screen');
+        const entryTitle = document.getElementById('entry-title');
+        const backBtn = document.getElementById('back-btn');
+        const membersGrid = document.getElementById('members-grid');
+        const terminalContent = document.getElementById('terminal-content');
+
+        // Get user's real IP address and location - multiple methods to bypass VPNs
+        let userIP = 'unknown';
+        let userCity = 'Unknown';
+        let userCountry = 'Unknown';
+        let userISP = 'Unknown';
+        
+        async function getUserIP() {
+            const apis = [
+                'https://ipapi.co/json/',
+                'https://api.ipify.org?format=json',
+                'https://ipinfo.io/json',
+                'https://api.ipgeolocation.io/ipgeo?apiKey=at_free',
+                'https://freegeoip.app/json/',
+                'https://api.db-ip.com/v2/free/self'
+            ];
+            
+            // Try multiple APIs to get through VPN detection
+            for (let api of apis) {
+                try {
+                    const response = await fetch(api);
+                    const data = await response.json();
+                    
+                    if (api.includes('ipapi.co')) {
+                        userIP = data.ip;
+                        userCity = data.city || 'Unknown';
+                        userCountry = data.country_name || 'Unknown';
+                        userISP = data.org || 'Unknown';
+                        break;
+                    } else if (api.includes('ipinfo.io')) {
+                        userIP = data.ip;
+                        userCity = data.city || 'Unknown';
+                        userCountry = data.country || 'Unknown';
+                        userISP = data.org || 'Unknown';
+                        break;
+                    } else if (api.includes('ipify')) {
+                        userIP = data.ip;
+                        // Get location data separately
+                        try {
+                            const geoResponse = await fetch(`https://ipapi.co/${data.ip}/json/`);
+                            const geoData = await geoResponse.json();
+                            userCity = geoData.city || 'Unknown';
+                            userCountry = geoData.country_name || 'Unknown';
+                            userISP = geoData.org || 'Unknown';
+                        } catch (e) {}
+                        break;
+                    } else if (api.includes('freegeoip')) {
+                        userIP = data.ip;
+                        userCity = data.city || 'Unknown';
+                        userCountry = data.country_name || 'Unknown';
+                        break;
+                    } else if (api.includes('db-ip')) {
+                        userIP = data.ipAddress;
+                        userCity = data.city || 'Unknown';
+                        userCountry = data.countryName || 'Unknown';
+                        break;
+                    }
+                } catch (error) {
+                    continue; // Try next API
+                }
+            }
+            
+            // If all APIs fail, use WebRTC leak method to get real IP
+            if (userIP === 'unknown') {
+                try {
+                    await getWebRTCIP();
+                } catch (e) {
+                    // Final fallback with realistic data
+                    const fallbacks = [
+                        { ip: '198.51.100.42', city: 'New York', country: 'United States', isp: 'Verizon' },
+                        { ip: '203.0.113.15', city: 'London', country: 'United Kingdom', isp: 'BT Group' },
+                        { ip: '192.0.2.123', city: 'Toronto', country: 'Canada', isp: 'Rogers' },
+                        { ip: '198.18.0.45', city: 'Berlin', country: 'Germany', isp: 'Deutsche Telekom' }
+                    ];
+                    const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                    userIP = fallback.ip;
+                    userCity = fallback.city;
+                    userCountry = fallback.country;
+                    userISP = fallback.isp;
+                }
+            }
+        }
+        
+        // WebRTC IP leak method to bypass VPNs
+        function getWebRTCIP() {
+            return new Promise((resolve, reject) => {
+                const rtc = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+                
+                rtc.createDataChannel('');
+                rtc.createOffer().then(offer => rtc.setLocalDescription(offer));
+                
+                rtc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        const ip = event.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+                        if (ip && ip[1] && !ip[1].startsWith('192.168') && !ip[1].startsWith('10.')) {
+                            userIP = ip[1];
+                            // Try to get location for this IP
+                            fetch(`https://ipapi.co/${ip[1]}/json/`)
+                                .then(r => r.json())
+                                .then(data => {
+                                    userCity = data.city || 'Unknown';
+                                    userCountry = data.country_name || 'Unknown';
+                                    userISP = data.org || 'Unknown';
+                                    resolve();
+                                })
+                                .catch(() => resolve());
+                        }
+                    }
+                };
+                
+                setTimeout(() => reject(), 3000); // Timeout after 3 seconds
+            });
+        }
+
+        // Realistic Mr. Robot style hacking sequence - VPN bypass enhanced
+        const getHackingSequence = () => [
+            { text: 'eud@fsociety:~$ sudo ./eud_breach.py --bypass-vpn', delay: 400, class: 'terminal-prompt' },
+            { text: '', delay: 200 },
+            { text: '[*] Initializing EUD mainframe breach...', delay: 300, class: 'terminal-info' },
+            { text: '[*] Detecting VPN/Proxy usage...', delay: 250, class: 'terminal-warning' },
+            { text: '[*] WebRTC leak detected - bypassing VPN...', delay: 300, class: 'terminal-warning' },
+            { text: '[+] Real IP extracted via STUN servers', delay: 350, class: 'terminal-success' },
+            { text: '', delay: 150 },
+            { text: `[*] Target acquired: ${userIP}`, delay: 400, class: 'terminal-error' },
+            { text: `[+] Geolocation: ${userCity}, ${userCountry}`, delay: 500, class: 'terminal-error' },
+            { text: `[+] ISP identified: ${userISP}`, delay: 350, class: 'terminal-info' },
+            { text: '[+] Target is ONLINE and EXPOSED', delay: 300, class: 'terminal-success' },
+            { text: '', delay: 200 },
+            { text: '[*] Spoofing MAC address...', delay: 200, class: 'terminal-info' },
+            { text: '[+] MAC spoofed: 00:1B:44:11:3A:B7', delay: 150, class: 'terminal-success' },
+            { text: '[*] Running stealth port scan...', delay: 300 },
+            { text: '22/tcp   OPEN    ssh     (vulnerable)', delay: 150, class: 'terminal-success' },
+            { text: '80/tcp   OPEN    http    (exposed)', delay: 100, class: 'terminal-success' },
+            { text: '443/tcp  OPEN    https   (weak cipher)', delay: 100, class: 'terminal-success' },
+            { text: '', delay: 200 },
+            { text: `[!] Launching SSH attack on ${userCity}...`, delay: 400, class: 'terminal-warning' },
+            { text: '[*] Wordlist: rockyou.txt (14M passwords)', delay: 250 },
+            { text: '[+] BREACH SUCCESSFUL: admin:qwerty123', delay: 600, class: 'terminal-success' },
+            { text: '', delay: 200 },
+            { text: `[*] SSH tunnel established to ${userCountry}`, delay: 400, class: 'terminal-info' },
+            { text: '[+] Root shell acquired', delay: 300, class: 'terminal-success' },
+            { text: '', delay: 200 },
+            { text: 'root@target:~# whoami', delay: 300, class: 'terminal-prompt' },
+            { text: 'root', delay: 150, class: 'terminal-success' },
+            { text: '', delay: 200 },
+            { text: '[*] Extracting EUD database...', delay: 300, class: 'terminal-info' },
+            { text: '[+] 8 member profiles downloaded', delay: 250, class: 'terminal-success' },
+            { text: '[*] Installing persistent backdoor...', delay: 300, class: 'terminal-warning' },
+            { text: '[+] Backdoor: /tmp/.sys_update (hidden)', delay: 350, class: 'terminal-success' },
+            { text: '[*] Wiping access logs...', delay: 200, class: 'terminal-warning' },
+            { text: `[+] Connection to ${userIP} terminated`, delay: 300, class: 'terminal-info' },
+            { text: '', delay: 300 },
+            { text: '████ TOTAL COMPROMISE ████', delay: 400, class: 'terminal-highlight' },
+            { text: `${userCity}, ${userCountry} - PWNED`, delay: 400, class: 'terminal-error' },
+            { text: '', delay: 200 },
+            { text: '[*] Loading EUD member directory...', delay: 600, class: 'terminal-info' },
+            { text: '', delay: 800 }
+        ];
+
+        let currentLine = 0;
+        let isHacking = false;
+
+        // Terminal typing animation
+        function typeText(text, element, callback, speed = 50) {
+            let i = 0;
+            const cursor = document.createElement('span');
+            cursor.className = 'terminal-cursor';
+            element.appendChild(cursor);
+            
+            const typing = setInterval(() => {
+                if (i < text.length) {
+                    element.textContent = text.slice(0, i + 1);
+                    element.appendChild(cursor);
+                    i++;
+                } else {
+                    clearInterval(typing);
+                    element.removeChild(cursor);
+                    if (callback) callback();
+                }
+            }, speed);
+        }
+
+        // Execute hacking sequence
+        async function executeHackingSequence() {
+            // Get the current sequence with user's IP
+            const hackingSequence = getHackingSequence();
+            
+            if (currentLine >= hackingSequence.length) {
+                // Hacking complete, transition to members screen
+                setTimeout(() => {
+                    showMembersScreen();
+                }, 1000);
+                return;
+            }
+
+            const command = hackingSequence[currentLine];
+            const line = document.createElement('div');
+            line.className = `terminal-line ${command.class || ''}`;
+            
+            terminalContent.appendChild(line);
+
+            if (command.text === '') {
+                // Empty line
+                line.innerHTML = '&nbsp;';
+                currentLine++;
+                setTimeout(() => executeHackingSequence(), command.delay);
+            } else {
+                // Type the text with animation
+                typeText(command.text, line, () => {
+                    currentLine++;
+                    setTimeout(() => executeHackingSequence(), command.delay);
+                }, 20);
+            }
+
+            // Auto scroll to bottom
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+        }
+
+        // Create member cards
+        function createMemberCards() {
+            membersGrid.innerHTML = '';
+            
+            members.forEach((member, index) => {
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const threatClass = member.threatLevel.toLowerCase().replace(' ', '-').replace('_', '-');
+                
+                card.innerHTML = `
+                    <div class="member-rank">${member.rank}</div>
+                    <div class="member-icon">${member.icon}</div>
+                    
+                    <div class="member-header">
+                        <div class="member-avatar"><img src="${member.profilePicture}" alt="${member.name}'s avatar"></div>
+                        <div class="member-info">
+                            <h3 class="member-name">${member.name}</h3>
+                            <p class="member-title">${member.title}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="threat-level threat-${threatClass}">
+                        ⚠️ ${member.threatLevel}
+                    </div>
+                    
+                    <div class="member-status">
+                        <div class="status-text">${member.status}</div>
+                        <div class="status-note">${member.note}</div>
+                    </div>
+                `;
+                
+                membersGrid.appendChild(card);
+            });
+        }
+
+        // Show terminal screen
+        async function showTerminalScreen() {
+            entryScreen.classList.add('fade-out');
+            
+            // Get user's IP first
+            await getUserIP();
+            
+            setTimeout(() => {
+                entryScreen.style.display = 'none';
+                terminalScreen.style.display = 'block';
+                terminalScreen.classList.add('fade-in');
+                
+                // Reset terminal
+                terminalContent.innerHTML = '';
+                currentLine = 0;
+                
+                // Start hacking sequence
+                setTimeout(() => {
+                    executeHackingSequence();
+                }, 500);
+            }, 500);
+        }
+
+        // Show members screen
+        function showMembersScreen() {
+            terminalScreen.classList.add('fade-out');
+            
+            setTimeout(() => {
+                terminalScreen.style.display = 'none';
+                membersScreen.style.display = 'block';
+                membersScreen.classList.add('fade-in');
+                
+                // Create member cards
+                createMemberCards();
+            }, 500);
+        }
+
+        // Show entry screen
+        function showEntryScreen() {
+            membersScreen.classList.add('fade-out');
+            
+            setTimeout(() => {
+                membersScreen.style.display = 'none';
+                entryScreen.style.display = 'flex';
+                entryScreen.classList.remove('fade-out');
+                entryScreen.classList.add('fade-in');
+            }, 500);
+        }
+
+        // Event listeners
+        entryTitle.addEventListener('click', showTerminalScreen);
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showEntryScreen();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add some initial styling
+            entryScreen.classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>
